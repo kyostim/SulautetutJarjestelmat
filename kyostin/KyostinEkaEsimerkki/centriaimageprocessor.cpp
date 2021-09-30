@@ -12,6 +12,11 @@ CentriaImageProcessor::~CentriaImageProcessor()
         killTimer(_timerId);
         _timerId = -1;
     }
+
+    if(_videoCapture.isOpened())
+    {
+        _videoCapture.release();
+    }
 }
 
 void CentriaImageProcessor::timerEvent(QTimerEvent *event)
