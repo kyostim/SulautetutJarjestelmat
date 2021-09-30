@@ -29,6 +29,12 @@ void CentriaImageProcessor::timerEvent(QTimerEvent *event)
     {
         cv::Mat image;
         _videoCapture.read(image);
+
+        cv::Mat grayImage;
+        cv::cvtColor(image,grayImage,cv::COLOR_BGR2GRAY);
+
         cv::imshow("image", image);
+        cv::imshow("grayImage", grayImage);
+
     }
 }
