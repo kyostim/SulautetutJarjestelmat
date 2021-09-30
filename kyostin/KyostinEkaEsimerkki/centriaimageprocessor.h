@@ -12,6 +12,7 @@ class CentriaImageProcessor : public QObject
 {
     Q_OBJECT
 public:
+    int ThresholdValue = 60;
     explicit CentriaImageProcessor(QObject *parent = nullptr);
     ~CentriaImageProcessor();
 
@@ -23,6 +24,7 @@ private:
     int _timerId = -1;
 
     cv::VideoCapture _videoCapture;
+
 
 };
 

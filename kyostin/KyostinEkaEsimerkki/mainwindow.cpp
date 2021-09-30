@@ -25,3 +25,11 @@ void MainWindow::on_pushButtonNappi_clicked()
     cv::Mat image=cv::imread("/home/centria/projects/KyostinEkaEsimerkki/kuva.jpg");
     cv::imshow("image",image);
 }
+
+void MainWindow::on_horizontalSlider_valueChanged(int value)
+{
+    if(_centriaImageProcessor != nullptr)
+    {
+        _centriaImageProcessor->ThresholdValue = ui->horizontalSlider->value();
+    }
+}

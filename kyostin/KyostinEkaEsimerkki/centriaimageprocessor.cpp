@@ -29,12 +29,18 @@ void CentriaImageProcessor::timerEvent(QTimerEvent *event)
     {
         cv::Mat image;
         _videoCapture.read(image);
-
+        if(image.cols>0)
+        {
         cv::Mat grayImage;
         cv::cvtColor(image,grayImage,cv::COLOR_BGR2GRAY);
 
-        cv::imshow("image", image);
-        cv::imshow("grayImage", grayImage);
+        cv::Mat thresholdImage;
+        cv::threshold(grayImage, thresholdImage,ThresholdValue,255,1);
+
+        //cv::imshow("image", image);
+        //cv::imshow("grayImage", grayImage);
+        cv::imshow("thresholdImage", thresholdImage);
+        }
 
     }
 }
