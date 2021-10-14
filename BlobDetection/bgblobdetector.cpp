@@ -157,7 +157,6 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                     cv::putText(keypointsImage,"BL",keypoints[biggestPointIndex].pt,1,1,cv::Scalar(255,0,0));
                     cv::putText(keypointsImage,"BR",keypoints[bottomRightIndex].pt,1,1,cv::Scalar(255,0,0));
 
-                    int t = 0;
 
                     cv::Mat contentAreaImage = cv::Mat(200,400, CV_8UC1, cv::Scalar(255,255,255));
                     std::vector<cv::Point2f> inputPoints, outputPoints;
@@ -176,6 +175,14 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                     cv::Mat lamda = cv::getPerspectiveTransform(inputPoints, outputPoints);
                     cv::warpPerspective(image,contentAreaImage,lamda,contentAreaImage.size());
                     cv::imshow("contentAreaImage",contentAreaImage);
+
+                    tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
+                    ocr->Init(nullptr, "eng", tesseract::OEM_LSTM_ONLY);
+                    ocr->SetImage(contentAreaImage.data, contentAreaImage.cols, contentAreaImage.rows,3,image.step);
+                    QString contentText = QString(ocr->GetUTF8Text());
+                    ocr->End();
+                    delete ocr;
+                    int t = 0;
                 }
 
                 cv::imshow("keypointsImage", keypointsImage);

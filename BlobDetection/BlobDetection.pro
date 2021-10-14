@@ -14,6 +14,9 @@ PKGCONFIG += opencv4
 
 LIBS += -ltesseract -llept
 
+INCLUDEPATH += /usr/include/leptonica
+INCLUDEPATH += /usr/include/tesseract
+
 CONFIG += c++11
 
 SOURCES += \
