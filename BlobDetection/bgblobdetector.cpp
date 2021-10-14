@@ -38,7 +38,8 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 {
     if(!_videoCapture.isOpened())
     {
-        _videoCapture.open("/dev/video0");
+        //_videoCapture.open("/dev/video0");
+        _videoCapture.open(0);
     }
     else
     {
@@ -83,7 +84,7 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                     QString sizetext = QString("Size:%1").arg(3.14 * radian *radian);
                     cv::circle(keypointsImage,keypoint.pt,radian,cv::Scalar(255,0,0));
                     cv::circle(image,keypoint.pt,radian,cv::Scalar(255,0,0));
-                    cv::putText(keypointsImage,sizetext.toUtf8().constData(),keypoint.pt,1,1,cv::Scalar(255,0,0));
+                    //cv::putText(keypointsImage,sizetext.toUtf8().constData(),keypoint.pt,1,1,cv::Scalar(255,0,0));
 
                 }
 
@@ -108,8 +109,8 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 
 
                     //Perspective correction
-                    cv::Mat contentAreaImage = cv::Mat(100,200, CV_8UC1, cv::Scalar(255,255,255));
-                    std::vector<cv::Point2f> inputPoints, outputPoints;
+//                    cv::Mat contentAreaImage = cv::Mat(100,200, CV_8UC1, cv::Scalar(255,255,255));
+//                    std::vector<cv::Point2f> inputPoints, outputPoints;
 
                     //find the biggest and smallest points
                     int biggestPointIndex = 0;
@@ -148,15 +149,23 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                                 bottomRightIndex = i;
                                 rightDistance = smallDistance;
                             }
-
                         }
                     }
 
+                    cv::putText(keypointsImage,"TL",keypoints[topLeftPointIndex].pt,1,1,cv::Scalar(255,0,0));
+                    cv::putText(keypointsImage,"TR",keypoints[smallestPointIndex].pt,1,1,cv::Scalar(255,0,0));
+                    cv::putText(keypointsImage,"BL",keypoints[biggestPointIndex].pt,1,1,cv::Scalar(255,0,0));
+                    cv::putText(keypointsImage,"BR",keypoints[bottomRightIndex].pt,1,1,cv::Scalar(255,0,0));
+
+                    int t = 0;
+
+                    cv::Mat contentAreaImage = cv::Mat(200,400, CV_8UC1, cv::Scalar(255,255,255));
+                    std::vector<cv::Point2f> inputPoints, outputPoints;
 
                     inputPoints.push_back(keypoints[topLeftPointIndex].pt);
                     inputPoints.push_back(keypoints[smallestPointIndex].pt);
-                    inputPoints.push_back(keypoints[biggestPointIndex].pt);
                     inputPoints.push_back(keypoints[bottomRightIndex].pt);
+                    inputPoints.push_back(keypoints[biggestPointIndex].pt);
 
                     outputPoints.push_back(cv::Point2f(0,0));
                     outputPoints.push_back(cv::Point2f(contentAreaImage.cols - 1,0));
@@ -165,7 +174,7 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 
 
                     cv::Mat lamda = cv::getPerspectiveTransform(inputPoints, outputPoints);
-                    cv::warpPerspective(image,contentAreaImage,lamda,cv::Size(contentAreaImage.cols, contentAreaImage.rows));
+                    cv::warpPerspective(image,contentAreaImage,lamda,contentAreaImage.size());
                     cv::imshow("contentAreaImage",contentAreaImage);
                 }
 

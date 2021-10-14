@@ -12,6 +12,8 @@ CONFIG += c++11
 CONFIG += link_pkgconfig
 PKGCONFIG += opencv4
 
+LIBS += -ltesseract -llept
+
 CONFIG += c++11
 
 SOURCES += \
