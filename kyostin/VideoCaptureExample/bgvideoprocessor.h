@@ -21,7 +21,10 @@ public:
     uchar UpperHue = 70;
     uchar UpperSaturation = 255;
     uchar UpperValue = 255;
+    uchar ThresholdMin = 25;
+    uchar ThresholdBlockSize = 11;
     bool AutoCalibration = false;
+    bool AdaptiveThreshold = true;
 
     explicit BGVideoProcessor(QObject *parent = nullptr);
     ~BGVideoProcessor();

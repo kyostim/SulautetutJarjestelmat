@@ -63,7 +63,7 @@ void BGVideoProcessor::timerEvent(QTimerEvent *event)
                     uchar hue = hsvImage.data[offset];
                     uchar saturation = hsvImage.data[offset + 1];
                     uchar value = hsvImage.data[offset + 2];
-                    QString hsvValuesText = QString("Hue=%1, Stauration=%2, Value=%3").arg(hue).arg(saturation).arg(value);
+                    QString hsvValuesText = QString("Hue=%1, Saturation=%2, Value=%3").arg(hue).arg(saturation).arg(value);
                     cv::putText(image,hsvValuesText.toUtf8().constData(),cv::Point(_clickedX + 5,_clickedY + 10),1,1,cv::Scalar(255,255,255));
 
                     if(AutoCalibration)
@@ -83,6 +83,17 @@ void BGVideoProcessor::timerEvent(QTimerEvent *event)
 
             cv::Mat inRangeImage;
             cv::inRange(hsvImage,cv::Scalar(LowerHue, LowerSaturation, LowerValue), cv::Scalar(UpperHue, UpperSaturation,UpperValue),inRangeImage);
+
+            cv::Mat thresholdImage;
+            if(AdaptiveThreshold)
+            {
+                cv::adaptiveThreshold(grayImage,thresholdImage,255,cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY,ThresholdBlockSize,2);
+            }
+            else
+            {
+                cv::threshold(grayImage,thresholdImage,ThresholdMin,255,cv::THRESH_BINARY);
+            }
+
 
             //cv::Mat blueChannel = image;
             //blueChannel -= cv::Scalar(255,255,0);
@@ -120,6 +131,8 @@ void BGVideoProcessor::timerEvent(QTimerEvent *event)
             cv::imshow("inRangeImage", inRangeImage);
             //cv::imshow("greenImage",greenImage);
             //cv::imshow("ownTestImage",ownTestImage);
+            cv::imshow("thresholdImage", thresholdImage);
+
         }
     }
 }

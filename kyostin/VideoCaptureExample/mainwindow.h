@@ -44,6 +44,13 @@ private slots:
 
     void on_checkBoxAutoCalibration_stateChanged(int arg1);
 
+    void on_horizontalSliderThresholdMin_valueChanged(int value);
+
+
+    void on_horizontalSliderThresholdBlockSize_valueChanged(int value);
+
+    void on_checkBoxAdaptiveThreshold_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     int _timerId = -1;
