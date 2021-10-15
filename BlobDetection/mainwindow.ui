@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>410</width>
-    <height>438</height>
+    <height>507</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -136,7 +136,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -276,6 +276,16 @@
       </layout>
      </item>
     </layout>
+   </widget>
+   <widget class="QPlainTextEdit" name="plainTextEditContentText">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>310</y>
+      <width>351</width>
+      <height>131</height>
+     </rect>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

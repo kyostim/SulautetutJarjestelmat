@@ -25,7 +25,7 @@ public:
     uchar MaxThreshold = 200;
 
     bool FilterbyArea = true;
-    int MinArea = 300;
+    int MinArea = 200;
     int MaxArea = 2500;
 
     bool FilterByCircularity = true;
@@ -35,6 +35,8 @@ public:
     bool FilterByInertia = true;
     float MinInertia = 0.0;
     float MaxInertia = 1.0;
+
+    QString ContentText = "";
 
     explicit BGBlobDetector(QObject *parent = nullptr);
     ~BGBlobDetector();
@@ -50,6 +52,7 @@ private:
 
     cv::VideoCapture _videoCapture;
     cv::Ptr<cv::SimpleBlobDetector> _detector;
+    tesseract::TessBaseAPI *_ocr = nullptr;
 
     void static MouseCallBack(int event, int x, int y, int flags, void* userdata);
 

@@ -2,7 +2,10 @@
 
 BGBlobDetector::BGBlobDetector(QObject *parent) : QObject(parent)
 {
-
+    setlocale(LC_ALL,"C");
+    _ocr = new tesseract::TessBaseAPI();
+    _ocr->Init(nullptr, "eng", tesseract::OEM_LSTM_ONLY);
+    _ocr->SetPageSegMode(tesseract::PSM_AUTO);
 }
 
 BGBlobDetector::~BGBlobDetector()
@@ -11,6 +14,12 @@ BGBlobDetector::~BGBlobDetector()
     if(_videoCapture.isOpened())
     {
         _videoCapture.release();
+    }
+
+    if(_ocr != nullptr)
+    {
+        _ocr->End();
+        delete _ocr;
     }
 }
 
@@ -158,8 +167,10 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                     cv::putText(keypointsImage,"BR",keypoints[bottomRightIndex].pt,1,1,cv::Scalar(255,0,0));
 
 
-                    cv::Mat contentAreaImage = cv::Mat(200,400, CV_8UC1, cv::Scalar(255,255,255));
+
                     std::vector<cv::Point2f> inputPoints, outputPoints;
+
+                    cv::Mat contentAreaImage = cv::Mat(200,400, CV_8UC1, cv::Scalar(255,255,255));
 
                     inputPoints.push_back(keypoints[topLeftPointIndex].pt);
                     inputPoints.push_back(keypoints[smallestPointIndex].pt);
@@ -173,16 +184,26 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 
 
                     cv::Mat lamda = cv::getPerspectiveTransform(inputPoints, outputPoints);
-                    cv::warpPerspective(image,contentAreaImage,lamda,contentAreaImage.size());
-                    cv::imshow("contentAreaImage",contentAreaImage);
+                    cv::warpPerspective(grayImage,contentAreaImage,lamda,contentAreaImage.size());
+                    cv::Rect textArea = cv::Rect(contentAreaImage.cols * 0.125, contentAreaImage.rows * 0.125, contentAreaImage.cols * 0.75, contentAreaImage.rows * 0.75);
+                    cv::Mat textAreaImage = contentAreaImage(textArea);
+                    cv::rectangle(contentAreaImage,textArea,cv::Scalar(0,0,255));
 
-                    tesseract::TessBaseAPI *ocr = new tesseract::TessBaseAPI();
-                    ocr->Init(nullptr, "eng", tesseract::OEM_LSTM_ONLY);
-                    ocr->SetImage(contentAreaImage.data, contentAreaImage.cols, contentAreaImage.rows,3,image.step);
-                    QString contentText = QString(ocr->GetUTF8Text());
-                    ocr->End();
-                    delete ocr;
-                    int t = 0;
+
+                    //cv::Mat textAreaImageGray, thresholdImage;
+                    //cv::cvtColor(textAreaImage,textAreaImageGray,cv::COLOR_BGR2GRAY);
+                    //cv::threshold(textAreaImageGray,thresholdImage,50,255,cv::THRESH_BINARY);
+
+                    cv::imshow("contentAreaImage",contentAreaImage);
+                    cv::imshow("textAreaImage",textAreaImage);
+                    //cv::imshow("thresholdImage",thresholdImage);
+
+
+                    _ocr->SetImage(textAreaImage.data, textAreaImage.cols, textAreaImage.rows,textAreaImage.channels(),textAreaImage.step);
+                    //char  *text = _ocr->GetUTF8Text();
+                    ContentText = QString(_ocr->GetUTF8Text());
+                    //_ocr->End();
+
                 }
 
                 cv::imshow("keypointsImage", keypointsImage);

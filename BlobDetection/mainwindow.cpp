@@ -49,6 +49,8 @@ void MainWindow::timerEvent(QTimerEvent *event)
         ui->checkBoxFilterByInertia->setChecked(_bgBlobDetector->FilterByInertia);
         ui->doubleSpinBoxInertiaMin->setValue(_bgBlobDetector->MinInertia);
         ui->doubleSpinBoxInertiaMax->setValue(_bgBlobDetector->MaxInertia);
+
+        ui->plainTextEditContentText->setPlainText(_bgBlobDetector->ContentText);
     }
 }
 
