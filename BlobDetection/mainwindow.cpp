@@ -51,6 +51,10 @@ void MainWindow::timerEvent(QTimerEvent *event)
         ui->doubleSpinBoxInertiaMax->setValue(_bgBlobDetector->MaxInertia);
 
         ui->plainTextEditContentText->setPlainText(_bgBlobDetector->ContentText);
+        ui->plainTextEditContentText->appendPlainText(QString("Confidence=%1").arg(_bgBlobDetector->Confidence));
+        ui->plainTextEditContentText->appendPlainText(QString("Angle=%1").arg(_bgBlobDetector->Angle));
+        ui->plainTextEditContentText->appendPlainText(QString("PositionX=%1").arg(_bgBlobDetector->PositionX));
+        ui->plainTextEditContentText->appendPlainText(QString("PositionY=%1").arg(_bgBlobDetector->PositionY));
     }
 }
 

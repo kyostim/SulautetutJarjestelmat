@@ -2,6 +2,8 @@
 
 BGBlobDetector::BGBlobDetector(QObject *parent) : QObject(parent)
 {
+    LoadConfigurationFile();
+
     setlocale(LC_ALL,"C");
     _ocr = new tesseract::TessBaseAPI();
     _ocr->Init(nullptr, "eng", tesseract::OEM_LSTM_ONLY);
@@ -45,10 +47,13 @@ void BGBlobDetector::Stop()
 
 void BGBlobDetector::timerEvent(QTimerEvent *event)
 {
+    LoadConfigurationFile();
+
     if(!_videoCapture.isOpened())
     {
         //_videoCapture.open("/dev/video0");
-        _videoCapture.open(0);
+        //_videoCapture.open(0);
+        _videoCapture.open("/home/centria/projects/SulautetutJarjestelmat/BlobDetection/TestVideo.mp4");
     }
     else
     {
@@ -92,11 +97,17 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                     int radian = keypoint.size / 2;
                     QString sizetext = QString("Size:%1").arg(3.14 * radian *radian);
                     cv::circle(keypointsImage,keypoint.pt,radian,cv::Scalar(255,0,0));
-                    cv::circle(image,keypoint.pt,radian,cv::Scalar(255,0,0));
-                    //cv::putText(keypointsImage,sizetext.toUtf8().constData(),keypoint.pt,1,1,cv::Scalar(255,0,0));
+                    cv::circle(image,keypoint.pt,radian,cv::Scalar(255,255,255),2);
+                    cv::putText(image,sizetext.toUtf8().constData(),cv::Point(keypoint.pt.x, keypoint.pt.y -10),1,1,cv::Scalar(255,0,0));
+                    //cv::line(keypointsImage,cv::Point(keypoint.pt.x - radian, keypoint.pt.y),cv::Point(keypoint.pt.x + radian, keypoint.pt.y),cv::Scalar(255,0,0));
 
                 }
 
+                ContentText = "";
+                Confidence = -1;
+                Angle = -1;
+                PositionX = -1;
+                PositionY = -1;
                 if(keypoints.size() == 4)
                 {
 //                    float x1 = keypoints[0].pt.x;
@@ -161,10 +172,15 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                         }
                     }
 
-                    cv::putText(keypointsImage,"TL",keypoints[topLeftPointIndex].pt,1,1,cv::Scalar(255,0,0));
-                    cv::putText(keypointsImage,"TR",keypoints[smallestPointIndex].pt,1,1,cv::Scalar(255,0,0));
-                    cv::putText(keypointsImage,"BL",keypoints[biggestPointIndex].pt,1,1,cv::Scalar(255,0,0));
-                    cv::putText(keypointsImage,"BR",keypoints[bottomRightIndex].pt,1,1,cv::Scalar(255,0,0));
+                    double TLr = keypoints[topLeftPointIndex].size / 2;
+                    QString TLText = QString("TL(S:%1)").arg(TLr *TLr * 3.14);
+                    QString TRText = QString("TR(S:%1)").arg(keypoints[smallestPointIndex].size);
+                    QString BLText = QString("BL(S:%1)").arg(keypoints[biggestPointIndex].size);
+                    QString BRText = QString("BR(S:%1)").arg(keypoints[bottomRightIndex].size);
+                    cv::putText(keypointsImage,TLText.toUtf8().constData(),keypoints[topLeftPointIndex].pt,1,1,cv::Scalar(255,0,0));
+                    cv::putText(keypointsImage,TRText.toUtf8().constData(),keypoints[smallestPointIndex].pt,1,1,cv::Scalar(255,0,0));
+                    cv::putText(keypointsImage,BLText.toUtf8().constData(),keypoints[biggestPointIndex].pt,1,1,cv::Scalar(255,0,0));
+                    cv::putText(keypointsImage,BRText.toUtf8().constData(),keypoints[bottomRightIndex].pt,1,1,cv::Scalar(255,0,0));
 
 
 
@@ -185,7 +201,7 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 
                     cv::Mat lamda = cv::getPerspectiveTransform(inputPoints, outputPoints);
                     cv::warpPerspective(grayImage,contentAreaImage,lamda,contentAreaImage.size());
-                    cv::Rect textArea = cv::Rect(contentAreaImage.cols * 0.125, contentAreaImage.rows * 0.125, contentAreaImage.cols * 0.75, contentAreaImage.rows * 0.75);
+                    cv::Rect textArea = cv::Rect(contentAreaImage.cols * 0.1, contentAreaImage.rows * 0.1, contentAreaImage.cols * 0.8, contentAreaImage.rows * 0.8);
                     cv::Mat textAreaImage = contentAreaImage(textArea);
                     cv::rectangle(contentAreaImage,textArea,cv::Scalar(0,0,255));
 
@@ -200,9 +216,21 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 
 
                     _ocr->SetImage(textAreaImage.data, textAreaImage.cols, textAreaImage.rows,textAreaImage.channels(),textAreaImage.step);
-                    //char  *text = _ocr->GetUTF8Text();
-                    ContentText = QString(_ocr->GetUTF8Text());
+
+
+                    ContentText = QString(_ocr->GetUTF8Text()).trimmed();
+                    if(!ContentText.isEmpty())
+                    {
+                        Confidence = _ocr->MeanTextConf();
+                        float y = keypoints[smallestPointIndex].pt.y - keypoints[topLeftPointIndex].pt.y;
+                        float x = keypoints[topLeftPointIndex].pt.x - keypoints[smallestPointIndex].pt.x;
+                        Angle = qAtan2(y,x) * 57.2958;
+                        PositionX =  (keypoints[topLeftPointIndex].pt.x + keypoints[smallestPointIndex].pt.x +  keypoints[biggestPointIndex].pt.x + keypoints[bottomRightIndex].pt.x)/4;
+                        PositionY =  (keypoints[topLeftPointIndex].pt.y + keypoints[smallestPointIndex].pt.y +  keypoints[biggestPointIndex].pt.y + keypoints[bottomRightIndex].pt.y)/4;
+                    }
                     //_ocr->End();
+
+                    //cv::imwrite("/home/centria/projects/Ohjelmistoprojekti/RESTAPI/Image.jpg", image);
 
                 }
 
@@ -217,9 +245,79 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
             cv::imshow("image",image);
             //cv::imshow("grayImage",grayImage);
             _detector->clear();
+
+            cv::imwrite("/home/centria/projects/Ohjelmistoprojekti/RESTAPI/Image.jpg", image);
+        }
+        else
+        {
+            _videoCapture.release();
         }
     }
 }
+
+void BGBlobDetector::LoadConfigurationFile()
+{
+    QFile configurationFile;
+    configurationFile.setFileName(ConfigurationFilename);
+    configurationFile.open(QIODevice::ReadOnly);
+    if(configurationFile.isOpen())
+    {
+        QString configurationXML = configurationFile.readAll();
+
+        QFileInfo fileInfo(configurationFile);
+        QDateTime modifiedDateTime = fileInfo.lastModified();
+
+        configurationFile.close();
+        if(modifiedDateTime != _lastModifiedDateTime)
+        {
+            _lastModifiedDateTime = modifiedDateTime;
+            QMap<QString, QString> configurations = CentriaXMLParser::ParseXMLContent("OCR_CONFIGURATION", configurationXML);
+
+            if(!configurations["MIN_THRESHOLD"].isEmpty())
+            {
+                MinThreshold = configurations["MIN_THRESHOLD"].toInt();
+            }
+
+            if(!configurations["MAX_THRESHOLD"].isEmpty())
+            {
+                MaxThreshold = configurations["MAX_THRESHOLD"].toInt();
+            }
+
+            if(!configurations["MIN_AREA"].isEmpty())
+            {
+                MinArea = configurations["MIN_AREA"].toInt();
+            }
+
+            if(!configurations["MAX_AREA"].isEmpty())
+            {
+                MaxArea = configurations["MAX_AREA"].toInt();
+            }
+
+            if(!configurations["MIN_CIRCULARITY"].isEmpty())
+            {
+                MinCircularity = configurations["MIN_CIRCULARITY"].toFloat();
+            }
+
+            if(!configurations["MAX_CIRCULARITY"].isEmpty())
+            {
+                MaxCircularity = configurations["MAX_CIRCULARITY"].toFloat();
+            }
+
+            if(!configurations["MIN_INERTIA"].isEmpty())
+            {
+                MinInertia = configurations["MIN_INERTIA"].toFloat();
+            }
+
+            if(!configurations["MAX_INERTIA"].isEmpty())
+            {
+                MaxInertia = configurations["MAX_INERTIA"].toFloat();
+            }
+        }
+    }
+
+}
+
+
 
 void BGBlobDetector::MouseCallBack(int event, int x, int y, int flags, void *userdata)
 {

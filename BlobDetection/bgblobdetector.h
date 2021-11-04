@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QtMath>
+#include <QFile>
+#include <QFileInfo>
+#include <QDateTime>
 
 #include <string>
 #include <iostream>
@@ -15,6 +18,8 @@
 
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
+
+#include "centriaxmlparser.h"
 
 
 class BGBlobDetector : public QObject
@@ -37,6 +42,13 @@ public:
     float MaxInertia = 1.0;
 
     QString ContentText = "";
+    int Confidence = -1;
+    int Angle = -1;
+    int PositionX = -1;
+    int PositionY = -1;
+
+    QString ConfigurationFilename = "/home/centria/projects/SulautetutJarjestelmat/BlobDetection/configuration.xml";
+    QDateTime _lastModifiedDateTime;
 
     explicit BGBlobDetector(QObject *parent = nullptr);
     ~BGBlobDetector();
@@ -53,6 +65,8 @@ private:
     cv::VideoCapture _videoCapture;
     cv::Ptr<cv::SimpleBlobDetector> _detector;
     tesseract::TessBaseAPI *_ocr = nullptr;
+
+    void LoadConfigurationFile();
 
     void static MouseCallBack(int event, int x, int y, int flags, void* userdata);
 
