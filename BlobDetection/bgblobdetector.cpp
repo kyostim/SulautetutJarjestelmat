@@ -58,8 +58,8 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
     else
     {
         cv::Mat image;
-        //_videoCapture.read(image);
-        image = cv::imread("/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Image1.jpg");
+        _videoCapture.read(image);
+        //image = cv::imread("/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Image1.jpg");
 
 
         if(image.cols > 0)
