@@ -34,7 +34,7 @@ app.get('/image', function (request, response) {
   console.log('image get');
   
   //const filename = './Responses/Image.jpg'; 
-  const filename = '/home/centria/projects/Ohjelmistoprojekti/RESTAPI/Image.jpg';
+  const filename = '/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Responses/Image.jpg';
   fileSystem.exists(filename,  function(exists) {
     if(exists) {
       const imageContent = fileSystem.readFileSync(filename);
@@ -48,7 +48,7 @@ app.get('/image', function (request, response) {
 app.get('/result', function (request, response) {
   console.log('configuration result');
   
-  const filename = './Responses/result.xml'; 
+  const filename = '/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Responses/result.xml'; 
   fileSystem.exists(filename,  function(exists) {
     if(exists) {
       const fileContent = fileSystem.readFileSync(filename, 'utf8');

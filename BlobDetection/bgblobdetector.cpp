@@ -58,10 +58,13 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
     else
     {
         cv::Mat image;
-        _videoCapture.read(image);
+        //_videoCapture.read(image);
+        image = cv::imread("/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Image1.jpg");
+
 
         if(image.cols > 0)
         {
+            //cv::imwrite("/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Image1.jpg", image);
             cv::Mat grayImage;
             cv::cvtColor(image,grayImage, cv::COLOR_BGR2GRAY);
 
@@ -245,8 +248,8 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
             cv::imshow("image",image);
             //cv::imshow("grayImage",grayImage);
             _detector->clear();
-
-            cv::imwrite("/home/centria/projects/Ohjelmistoprojekti/RESTAPI/Image.jpg", image);
+            WriteResults();
+            cv::imwrite("/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Responses/Image.jpg", image);
         }
         else
         {
@@ -315,6 +318,27 @@ void BGBlobDetector::LoadConfigurationFile()
         }
     }
 
+}
+
+void BGBlobDetector::WriteResults()
+{
+    QFile resultFile;
+    resultFile.setFileName(ResultFilename);
+    resultFile.open(QIODevice::WriteOnly);
+    if(resultFile.isOpen())
+    {
+        QByteArray resultXML = "<OCR_RESULT>";
+        resultXML.append(QString("<TEXT>%1</TEXT>").arg(ContentText));
+        resultXML.append(QString("<RELIABILITY>%1</RELIABILITY>").arg(Confidence));
+        resultXML.append(QString("<POSITIONX>%1</POSITIONX>").arg(PositionX));
+        resultXML.append(QString("<POSITIONY>%1</POSITIONY>").arg(PositionY));
+        resultXML.append(QString("<ANGLE>%1</ANGLE>").arg(Angle));
+        resultXML.append("</OCR_RESULT>");
+        resultFile.write(resultXML);
+        resultFile.close();
+
+
+    }
 }
 
 

@@ -48,6 +48,7 @@ public:
     int PositionY = -1;
 
     QString ConfigurationFilename = "/home/centria/projects/SulautetutJarjestelmat/BlobDetection/configuration.xml";
+    QString ResultFilename = "/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Responses/result.xml";
     QDateTime _lastModifiedDateTime;
 
     explicit BGBlobDetector(QObject *parent = nullptr);
@@ -67,6 +68,7 @@ private:
     tesseract::TessBaseAPI *_ocr = nullptr;
 
     void LoadConfigurationFile();
+    void WriteResults();
 
     void static MouseCallBack(int event, int x, int y, int flags, void* userdata);
 
