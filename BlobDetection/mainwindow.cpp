@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     _bgBlobDetector = new BGBlobDetector(this);
 
-    _timerId = startTimer(200);
+    _timerId = startTimer(500);
 }
 
 MainWindow::~MainWindow()

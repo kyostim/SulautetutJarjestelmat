@@ -47,8 +47,9 @@ public:
     int PositionX = -1;
     int PositionY = -1;
 
-    QString ConfigurationFilename = "/home/centria/projects/SulautetutJarjestelmat/BlobDetection/configuration.xml";
-    QString ResultFilename = "/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Responses/result.xml";
+    QString ConfigurationFilename = "/home/pi/projects/git/SulautetutJarjestelmat/BlobDetection/configuration.xml";
+    QString ResultFilename = "/home/pi/projects/git/SulautetutJarjestelmat/RESTAPI/Responses/result.xml";
+    QString ImageFilename = "/home/pi/projects/git/SulautetutJarjestelmat/RESTAPI/Responses/Image.jpg";
     QDateTime _lastModifiedDateTime;
 
     explicit BGBlobDetector(QObject *parent = nullptr);

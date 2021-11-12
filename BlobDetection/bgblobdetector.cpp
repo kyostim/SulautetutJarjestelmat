@@ -51,9 +51,9 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 
     if(!_videoCapture.isOpened())
     {
-        //_videoCapture.open("/dev/video0");
+        _videoCapture.open("/dev/video0");
         //_videoCapture.open(0);
-        _videoCapture.open("/home/centria/projects/SulautetutJarjestelmat/BlobDetection/TestVideo.mp4");
+        //_videoCapture.open("/home/centria/projects/SulautetutJarjestelmat/BlobDetection/TestVideo.mp4");
     }
     else
     {
@@ -213,8 +213,8 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
                     //cv::cvtColor(textAreaImage,textAreaImageGray,cv::COLOR_BGR2GRAY);
                     //cv::threshold(textAreaImageGray,thresholdImage,50,255,cv::THRESH_BINARY);
 
-                    cv::imshow("contentAreaImage",contentAreaImage);
-                    cv::imshow("textAreaImage",textAreaImage);
+                    //cv::imshow("contentAreaImage",contentAreaImage);
+                    //cv::imshow("textAreaImage",textAreaImage);
                     //cv::imshow("thresholdImage",thresholdImage);
 
 
@@ -237,7 +237,7 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
 
                 }
 
-                cv::imshow("keypointsImage", keypointsImage);
+                //cv::imshow("keypointsImage", keypointsImage);
             }
             cv::drawKeypoints( grayImage, keypoints, im_with_keypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
 
@@ -249,7 +249,7 @@ void BGBlobDetector::timerEvent(QTimerEvent *event)
             //cv::imshow("grayImage",grayImage);
             _detector->clear();
             WriteResults();
-            cv::imwrite("/home/centria/projects/SulautetutJarjestelmat/RESTAPI/Responses/Image.jpg", image);
+            cv::imwrite(ImageFilename.toUtf8().data(), image);
         }
         else
         {
